@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="nMCtl" nsURI="http://www.simolutions.org/nonmem/NMCtl" nsPrefix="nMCtl">
+  <eClassifiers xsi:type="ecore:EClass" name="Model">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="records" upperBound="-1"
+        eType="#//Record" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Record"/>
+  <eClassifiers xsi:type="ecore:EClass" name="CovarianceRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="options" upperBound="-1"
+        eType="#//CovarianceOption" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CovarianceOption"/>
+  <eClassifiers xsi:type="ecore:EClass" name="KeywordCovarianceOption" eSuperTypes="#//CovarianceOption">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="#//KeywordCovarianceOptionKey"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="KeywordCovarianceOptionKey">
+    <eLiterals name="SPECIAL" literal="SPECIAL"/>
+    <eLiterals name="COMPRESS" value="1" literal="COMPRESS"/>
+    <eLiterals name="NOSLOW" value="2" literal="NOSLOW"/>
+    <eLiterals name="SLOW" value="3" literal="SLOW"/>
+    <eLiterals name="NOFCOV" value="4" literal="NOFCOV"/>
+    <eLiterals name="RESUME" value="5" literal="RESUME"/>
+    <eLiterals name="CONDITIONAL" value="6" literal="CONDITIONAL"/>
+    <eLiterals name="UNCONDITIONAL" value="7" literal="UNCONDITIONAL"/>
+    <eLiterals name="OMITTED" value="8" literal="OMITTED"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NumberCovarianceOption" eSuperTypes="#//CovarianceOption">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="#//NumberCovarianceOptionKey"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="NumberCovarianceOptionKey">
+    <eLiterals name="TOL" literal="TOL"/>
+    <eLiterals name="ATOL" value="1" literal="ATOL"/>
+    <eLiterals name="SIGL" value="2" literal="SIGL"/>
+    <eLiterals name="SIGLO" value="3" literal="SIGLO"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="OtherCovarianceOption" eSuperTypes="#//CovarianceOption">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="#//OtherCovarianceOptionKey"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="OtherCovarianceOptionKey">
+    <eLiterals name="MATRIX" literal="MATRIX"/>
+    <eLiterals name="PRINT" value="1" literal="PRINT"/>
+    <eLiterals name="PARAFILE" value="2" literal="PARAFILE"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TableRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="values" unique="false"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="options" upperBound="-1"
+        eType="#//TableOption" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TableOption"/>
+  <eClassifiers xsi:type="ecore:EClass" name="OtherTableOption" eSuperTypes="#//TableOption">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="#//OtherTableOptionKey"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="OtherTableOptionKey">
+    <eLiterals name="FILE" literal="FILE"/>
+    <eLiterals name="FORMAT" value="1" literal="FORMAT"/>
+    <eLiterals name="LFORMAT" value="2" literal="LFORMAT"/>
+    <eLiterals name="RFORMAT" value="3" literal="RFORMAT"/>
+    <eLiterals name="ESAMPLE" value="4" literal="ESAMPLE"/>
+    <eLiterals name="SEED" value="5" literal="SEED"/>
+    <eLiterals name="RANMETHOD" value="6" literal="RANMETHOD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="KeywordTableOption" eSuperTypes="#//TableOption">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="#//KeywordTableOptionKey"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="KeywordTableOptionKey">
+    <eLiterals name="PRINT" literal="PRINT"/>
+    <eLiterals name="NOPRINT" value="1" literal="NOPRINT"/>
+    <eLiterals name="NOHEADER" value="2" literal="NOHEADER"/>
+    <eLiterals name="ONEHEADER" value="3" literal="ONEHEADER"/>
+    <eLiterals name="NOTITLE" value="4" literal="NOTITLE"/>
+    <eLiterals name="NOLABEL" value="5" literal="NOLABEL"/>
+    <eLiterals name="FIRSTONLY" value="6" literal="FIRSTONLY"/>
+    <eLiterals name="NOFORWARD" value="7" literal="NOFORWARD"/>
+    <eLiterals name="FORWARD" value="8" literal="FORWARD"/>
+    <eLiterals name="APPEND" value="9" literal="APPEND"/>
+    <eLiterals name="NOAPPEND" value="10" literal="NOAPPEND"/>
+    <eLiterals name="WRESCHOL" value="11" literal="WRESCHOL"/>
+    <eLiterals name="UNCONDITIONAL" value="12" literal="UNCONDITIONAL"/>
+    <eLiterals name="CONDITIONAL" value="13" literal="CONDITIONAL"/>
+    <eLiterals name="OMITTED" value="14" literal="OMITTED"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EstimationRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="options" upperBound="-1"
+        eType="#//EstimationOption" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EstimationOption"/>
+  <eClassifiers xsi:type="ecore:EClass" name="OtherEstimationOption" eSuperTypes="#//EstimationOption">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="#//OtherEstimationOptionKey"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="OtherEstimationOptionKey">
+    <eLiterals name="FILE" literal="FILE"/>
+    <eLiterals name="MSFO" value="1" literal="MSFO"/>
+    <eLiterals name="PARAFILE" value="2" literal="PARAFILE"/>
+    <eLiterals name="FORMAT" value="3" literal="FORMAT"/>
+    <eLiterals name="DELIM" value="4" literal="DELIM"/>
+    <eLiterals name="GRD" value="5" literal="GRD"/>
+    <eLiterals name="GRID" value="6" literal="GRID"/>
+    <eLiterals name="METHOD" value="7" literal="METHOD"/>
+    <eLiterals name="MUM" value="8" literal="MUM"/>
+    <eLiterals name="ORDER" value="9" literal="ORDER"/>
+    <eLiterals name="RANMETHOD" value="10" literal="RANMETHOD"/>
+    <eLiterals name="ZERO" value="11" literal="ZERO"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NumberEstimationOption" eSuperTypes="#//EstimationOption">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="#//NumberEstimationOptionKey"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="NumberEstimationOptionKey">
+    <eLiterals name="ATOL" literal="ATOL"/>
+    <eLiterals name="AUTO" value="1" literal="AUTO"/>
+    <eLiterals name="CALPHA" value="2" literal="CALPHA"/>
+    <eLiterals name="CINTERVAL" value="3" literal="CINTERVAL"/>
+    <eLiterals name="CITER" value="4" literal="CITER"/>
+    <eLiterals name="CNSAMP" value="5" literal="CNSAMP"/>
+    <eLiterals name="CONSTRAIN" value="6" literal="CONSTRAIN"/>
+    <eLiterals name="CTYPE" value="7" literal="CTYPE"/>
+    <eLiterals name="DERCONT" value="8" literal="DERCONT"/>
+    <eLiterals name="DF" value="9" literal="DF"/>
+    <eLiterals name="DFS" value="10" literal="DFS"/>
+    <eLiterals name="EONLY" value="11" literal="EONLY"/>
+    <eLiterals name="ETADER" value="12" literal="ETADER"/>
+    <eLiterals name="ETASTYPE" value="13" literal="ETASTYPE"/>
+    <eLiterals name="FNLETA" value="14" literal="FNLETA"/>
+    <eLiterals name="IACCEPT" value="15" literal="IACCEPT"/>
+    <eLiterals name="ISAMPEND" value="16" literal="ISAMPEND"/>
+    <eLiterals name="ISAMPLE" value="17" literal="ISAMPLE"/>
+    <eLiterals name="ISAMPLE_M1" value="18" literal="ISAMPLE_M1"/>
+    <eLiterals name="ISAMPLE_M1A" value="19" literal="ISAMPLE_M1A"/>
+    <eLiterals name="ISAMPLE_M2" value="20" literal="ISAMPLE_M2"/>
+    <eLiterals name="ISAMPLE_M3" value="21" literal="ISAMPLE_M3"/>
+    <eLiterals name="ISCALE_MAX" value="22" literal="ISCALE_MAX"/>
+    <eLiterals name="ISCALE_MIN" value="23" literal="ISCALE_MIN"/>
+    <eLiterals name="MAPINTER" value="24" literal="MAPINTER"/>
+    <eLiterals name="MAPITER" value="25" literal="MAPITER"/>
+    <eLiterals name="MAXEVAL" value="26" literal="MAXEVAL"/>
+    <eLiterals name="MAXEVALS" value="27" literal="MAXEVALS"/>
+    <eLiterals name="MCETA" value="28" literal="MCETA"/>
+    <eLiterals name="NBURN" value="29" literal="NBURN"/>
+    <eLiterals name="NITER" value="30" literal="NITER"/>
+    <eLiterals name="NOCOV" value="31" literal="NOCOV"/>
+    <eLiterals name="NOLABEL" value="32" literal="NOLABEL"/>
+    <eLiterals name="NONINFETA" value="33" literal="NONINFETA"/>
+    <eLiterals name="NOPRIOR" value="34" literal="NOPRIOR"/>
+    <eLiterals name="NOTITLE" value="35" literal="NOTITLE"/>
+    <eLiterals name="NUMDER" value="36" literal="NUMDER"/>
+    <eLiterals name="OACCEPT" value="37" literal="OACCEPT"/>
+    <eLiterals name="OPTMAP" value="38" literal="OPTMAP"/>
+    <eLiterals name="OSAMPLE_M1" value="39" literal="OSAMPLE_M1"/>
+    <eLiterals name="OSAMPLE_M2" value="40" literal="OSAMPLE_M2"/>
+    <eLiterals name="PACCEPT" value="41" literal="PACCEPT"/>
+    <eLiterals name="PRINT" value="42" literal="PRINT"/>
+    <eLiterals name="PSAMPLE_M1" value="43" literal="PSAMPLE_M1"/>
+    <eLiterals name="PSAMPLE_M2" value="44" literal="PSAMPLE_M2"/>
+    <eLiterals name="PSAMPLE_M3" value="45" literal="PSAMPLE_M3"/>
+    <eLiterals name="PSCALE_MAX" value="46" literal="PSCALE_MAX"/>
+    <eLiterals name="PSCALE_MIN" value="47" literal="PSCALE_MIN"/>
+    <eLiterals name="SEED" value="48" literal="SEED"/>
+    <eLiterals name="SELECT" value="49" literal="SELECT"/>
+    <eLiterals name="SIGDIGITS" value="50" literal="SIGDIGITS"/>
+    <eLiterals name="NSIG" value="51" literal="NSIG"/>
+    <eLiterals name="NSIGDIGITS" value="52" literal="NSIGDIGITS"/>
+    <eLiterals name="SIGL" value="53" literal="SIGL"/>
+    <eLiterals name="SIGLO" value="54" literal="SIGLO"/>
+    <eLiterals name="SLOW" value="55" literal="SLOW"/>
+    <eLiterals name="STDOBJ" value="56" literal="STDOBJ"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="KeywordEstimationOption" eSuperTypes="#//EstimationOption">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="#//KeywordEstimationOptionKey"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="KeywordEstimationOptionKey">
+    <eLiterals name="ABORT" literal="ABORT"/>
+    <eLiterals name="NOABORT" value="1" literal="NOABORT"/>
+    <eLiterals name="NOHABORT" value="2" literal="NOHABORT"/>
+    <eLiterals name="CENTERING" value="3" literal="CENTERING"/>
+    <eLiterals name="NOCENTERING" value="4" literal="NOCENTERING"/>
+    <eLiterals name="ETABARCHECK" value="5" literal="ETABARCHECK"/>
+    <eLiterals name="NOETABARCHECK" value="6" literal="NOETABARCHECK"/>
+    <eLiterals name="FO" value="7" literal="FO"/>
+    <eLiterals name="NOFO" value="8" literal="NOFO"/>
+    <eLiterals name="INTERACTION" value="9" literal="INTERACTION"/>
+    <eLiterals name="NOINTERACTION" value="10" literal="NOINTERACTION"/>
+    <eLiterals name="LAPLACIAN" value="11" literal="LAPLACIAN"/>
+    <eLiterals name="NOLAPLACIAN" value="12" literal="NOLAPLACIAN"/>
+    <eLiterals name="LIKELIHOOD" value="13" literal="LIKELIHOOD"/>
+    <eLiterals name="TWOLOGLIKELIHOOD" value="14" literal="-2LOGLIKELIHOOD"/>
+    <eLiterals name="NUMERICAL" value="15" literal="NUMERICAL"/>
+    <eLiterals name="NONUMERICAL" value="16" literal="NONUMERICAL"/>
+    <eLiterals name="OMEGABOUNDTEST" value="17" literal="OMEGABOUNDTEST"/>
+    <eLiterals name="NOOMEGABOUNDTEST" value="18" literal="NOOMEGABOUNDTEST"/>
+    <eLiterals name="OMITTED" value="19" literal="OMITTED"/>
+    <eLiterals name="POSTHOC" value="20" literal="POSTHOC"/>
+    <eLiterals name="NOPOSTHOC" value="21" literal="NOPOSTHOC"/>
+    <eLiterals name="PREDICTION" value="22" literal="PREDICTION"/>
+    <eLiterals name="REPEAT" value="23" literal="REPEAT"/>
+    <eLiterals name="NOREPEAT" value="24" literal="NOREPEAT"/>
+    <eLiterals name="REPEAT1" value="25" literal="REPEAT1"/>
+    <eLiterals name="NOREPEAT1" value="26" literal="NOREPEAT1"/>
+    <eLiterals name="REPEAT2" value="27" literal="REPEAT2"/>
+    <eLiterals name="NOREPEAT2" value="28" literal="NOREPEAT2"/>
+    <eLiterals name="SIGMABOUNDTEST" value="29" literal="SIGMABOUNDTEST"/>
+    <eLiterals name="NOSIGMABOUNDTEST" value="30" literal="NOSIGMABOUNDTEST"/>
+    <eLiterals name="SLOW" value="31" literal="SLOW"/>
+    <eLiterals name="NOSLOW" value="32" literal="NOSLOW"/>
+    <eLiterals name="SORT" value="33" literal="SORT"/>
+    <eLiterals name="NOSORT" value="34" literal="NOSORT"/>
+    <eLiterals name="STIELTJES" value="35" literal="STIELTJES"/>
+    <eLiterals name="THETABOUNDTEST" value="36" literal="THETABOUNDTEST"/>
+    <eLiterals name="NOTHETABOUNDTEST" value="37" literal="NOTHETABOUNDTEST"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RecordOption">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//OptionValue"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="OptionValue">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" unique="false" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PkRecord" eSuperTypes="#//Record #//ErrorRecord">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="code" eType="#//AbbreviatedCode"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ErrorRecord" eSuperTypes="#//Record"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AbbreviatedCode">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="statements" upperBound="-1"
+        eType="#//AbbreviatedCodeStatement" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbbreviatedCodeStatement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Assignment" eSuperTypes="#//AbbreviatedCodeStatement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="A" eType="#//AssignedValue"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="B" eType="#//Expression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AssignedValue">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Condition">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="#//BoolExpression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="bool" unique="false" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="right" upperBound="-1"
+        eType="#//Condition" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BoolExpression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="#//Expression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="comp" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="right" eType="#//Expression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Expression"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PriorRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="subroutine" eType="#//Subroutine"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" upperBound="-1"
+        eType="#//Condition" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="arguments" upperBound="-1"
+        eType="#//PriorSubroutineArgument" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PriorSubroutineArgument">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Subroutine">
+    <eLiterals name="TNPRI" literal="TNPRI"/>
+    <eLiterals name="NWPRI" value="1" literal="NWPRI"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SubroutinesRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="library" unique="false"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ProblemRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DataRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="format" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ignore" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="null" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="wide" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="noWide" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="checkout" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="records" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lrecl" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="rewind" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="noRewind" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="InputRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="columns" upperBound="-1"
+        eType="#//InputColumn" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="InputColumn">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="alternative" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ThetaRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="values" upperBound="-1"
+        eType="#//EstimateValueSet" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="OmegaRecord" eSuperTypes="#//Record"/>
+  <eClassifiers xsi:type="ecore:EClass" name="DiagonalOmega" eSuperTypes="#//OmegaRecord">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="diagonal" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="values" upperBound="-1"
+        eType="#//EstimateValueSet" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BlockOmega" eSuperTypes="#//OmegaRecord">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="block" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="values" upperBound="-1"
+        eType="#//EstimateValueSet" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BlockSameOmega" eSuperTypes="#//OmegaRecord">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="block" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="same" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="values" upperBound="-1"
+        eType="#//EstimateValueSet" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BlockValuesOmega" eSuperTypes="#//OmegaRecord">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="block" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="diag" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="odiag" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SigmaRecord" eSuperTypes="#//Record">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="values" upperBound="-1"
+        eType="#//EstimateValueSet" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EstimateValueSet">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//EstimateValue"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="times" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EstimateValue">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="init" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fixed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="low" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="high" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EstimateRange" eSuperTypes="#//EstimateValue">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fixedOutsideBounds" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="upper" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Addition" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="#//Expression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="opts" unique="false" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rights" upperBound="-1"
+        eType="#//Expression" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Multiplication" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="#//Expression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="opts" unique="false" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rights" upperBound="-1"
+        eType="#//Expression" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Power" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="#//Expression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rights" upperBound="-1"
+        eType="#//Expression" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SingleVectorCall" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="vector" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="i" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DoubleVectorCall" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="vector" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="i" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="j" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FunctionCall" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="function" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="argument" eType="#//Expression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Variable" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//AssignedValue"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NumberLiteral" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+</ecore:EPackage>

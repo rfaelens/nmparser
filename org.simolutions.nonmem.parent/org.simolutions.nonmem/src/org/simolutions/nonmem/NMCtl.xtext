@@ -1,0 +1,282 @@
+grammar org.simolutions.nonmem.NMCtl
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+generate nMCtl "http://www.simolutions.org/nonmem/NMCtl"
+
+Model hidden(NM_COMMENT, WS): records+=Record*;
+
+// The text must be contained on a single record, and only the first 72 characters of text (starting with the second character after the record name) are used in the heading. Spaces and semicolons in the text are included "as is".
+terminal PROBLEM_RECORD: '$PRO' -> ('\r'? '\n')? ;
+// See IV.pdf page 18: Text after a semicolon is regarded as a comment
+terminal NM_COMMENT: ';' !('\n'|'\r')* ('\r'? '\n')?;
+// See IV.pdf page 18: sections can be abbreviated to 3 letters
+terminal INPUT_RECORD: ('$INP' ('U'|'UT')?) | '$INPT';
+terminal DATA_RECORD: ('$DAT' ('A')?) | '$INFILE';
+terminal SUBROUTINES_RECORD: '$SUB' ('R'|'RO'|'ROU'|'ROUT'|'ROUTI'|'ROUTIN'|'ROUTINE'|'ROUTINES')?;
+terminal PRIOR_RECORD: '$PRI' ('O'|'OR')?;
+terminal PK_RECORD: '$PK';
+terminal ERROR_RECORD: '$ERR' ('O'|'OR')?;
+terminal THETA_RECORD: '$THETA';
+terminal OMEGA_RECORD: '$OMEGA';
+terminal SIGMA_RECORD: '$SIGMA';
+terminal ESTIMATION_RECORD: '$EST' ('M'|'I'|'IM'|'IMA'|'IMAT'|'IMATI'|'IMATIO'|'IMATION')?;
+terminal COVARIANCE_RECORD: '$COV' ('R'|'A'|'AR'|'ARI'|'ARIA'|'ARIAN'|'ARIANC'|'ARIANCE')?;
+terminal TABLE_RECORD: '$TABLE';
+
+terminal ID  		: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
+terminal STRING	: 
+			'"' ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|'"') )* '"' |
+			"'" ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|"'") )* "'"
+		;
+
+tNUMBER returns ecore::EFloat    : INT | NUMBER;
+terminal INT returns ecore::EInt: ('0'..'9')+;
+terminal NUMBER returns ecore::EFloat:
+(('+'|'-')? INT ('.'INT?) (('E'|'e')('+'|'-')? INT )?) |
+(('+'|'-')? INT           (('E'|'e')('+'|'-')? INT ) ) |
+(                ('.'INT) (('E'|'e')('+'|'-')? INT )?) |
+('-'        INT                                      );
+terminal WS			: (' '|'\t'|'\r'|'\n')+;
+
+FileName: (INT | ID | '.' | '_' | '-')+;
+
+Record:
+	ProblemRecord | 
+	InputRecord | 
+	DataRecord | 
+	SubroutinesRecord
+	| PriorRecord
+	| PkRecord
+	| ErrorRecord
+	| ThetaRecord | OmegaRecord | SigmaRecord
+	| EstimationRecord //|SimulationRecord
+	| TableRecord
+	| CovarianceRecord
+	;
+
+CovarianceRecord: {CovarianceRecord} COVARIANCE_RECORD (options+=CovarianceOption)*;
+CovarianceOption: KeywordCovarianceOption | NumberCovarianceOption | OtherCovarianceOption;
+KeywordCovarianceOption: {KeywordCovarianceOption} value=KeywordCovarianceOptionKey;
+enum KeywordCovarianceOptionKey: SPECIAL|COMPRESS|NOSLOW|SLOW|NOFCOV|RESUME|CONDITIONAL|UNCONDITIONAL|OMITTED;
+NumberCovarianceOption: key=NumberCovarianceOptionKey '=' value=tNUMBER;
+enum NumberCovarianceOptionKey:	TOL|ATOL|SIGL|SIGLO;
+OtherCovarianceOption: key=OtherCovarianceOptionKey '=' value=FileName;
+enum OtherCovarianceOptionKey: MATRIX|PRINT|PARAFILE;
+
+TableRecord: {TableRecord} TABLE_RECORD (values+=ID)* (options+=TableOption)*;
+TableOption: KeywordTableOption | OtherTableOption;
+OtherTableOption:
+	{OtherTableOption} key=OtherTableOptionKey '=' value=FileName
+;
+enum OtherTableOptionKey: FILE|FORMAT|LFORMAT|RFORMAT|ESAMPLE|SEED|RANMETHOD;
+KeywordTableOption: {KeywordTableOption} key=KeywordTableOptionKey;
+enum KeywordTableOptionKey: 
+	PRINT|NOPRINT|NOHEADER|ONEHEADER|NOTITLE|NOLABEL|FIRSTONLY|NOFORWARD|FORWARD|
+         APPEND|NOAPPEND|WRESCHOL|UNCONDITIONAL|CONDITIONAL|OMITTED
+;
+
+// Lots of options! Lots of ways to specify them in the grammar. We chose to implement this as discrete enums depending on the allowed type of the argument. 
+// This does allow for conflicting POSTHOC|NOPOSTHOC in the grammar, but this can be detected later.
+EstimationRecord: {EstimationRecord} ESTIMATION_RECORD (options+=EstimationOption)*;
+EstimationOption: KeywordEstimationOption | NumberEstimationOption | OtherEstimationOption;
+
+OtherEstimationOption: key=OtherEstimationOptionKey '=' value=FileName;
+// TODO: major simplification; we should describe the syntax for each option...
+enum OtherEstimationOptionKey: FILE|MSFO|PARAFILE|FORMAT|DELIM|GRD|GRID|METHOD|MUM|ORDER|RANMETHOD|ZERO;
+
+NumberEstimationOption: key=NumberEstimationOptionKey '=' value=tNUMBER;
+enum NumberEstimationOptionKey: 
+	ATOL|AUTO|CALPHA|CINTERVAL|CITER|CNSAMP|CONSTRAIN|CTYPE|DERCONT|DF|DFS|EONLY|ETADER|ETASTYPE|
+	FNLETA|IACCEPT|ISAMPEND|ISAMPLE|ISAMPLE_M1|ISAMPLE_M1A|ISAMPLE_M2|ISAMPLE_M3|ISCALE_MAX|
+	ISCALE_MIN|MAPINTER|MAPITER|MAXEVAL|MAXEVALS|MCETA|NBURN|NITER|NOCOV|NOLABEL|NONINFETA|NOPRIOR|
+	NOTITLE|NUMDER|OACCEPT|OPTMAP|OSAMPLE_M1|OSAMPLE_M2|PACCEPT|PRINT|PSAMPLE_M1|PSAMPLE_M2|
+	PSAMPLE_M3|PSCALE_MAX|PSCALE_MIN|SEED|SELECT|SIGDIGITS|NSIG|NSIGDIGITS|SIGL|SIGLO|SLOW|STDOBJ
+;
+KeywordEstimationOption: {KeywordEstimationOption} value=KeywordEstimationOptionKey;
+enum KeywordEstimationOptionKey: ABORT|NOABORT|NOHABORT|CENTERING|NOCENTERING|ETABARCHECK|NOETABARCHECK|FO|NOFO|
+	INTERACTION|NOINTERACTION|LAPLACIAN|NOLAPLACIAN|LIKELIHOOD|
+	TWOLOGLIKELIHOOD='-2LOGLIKELIHOOD'|NUMERICAL|NONUMERICAL|OMEGABOUNDTEST|NOOMEGABOUNDTEST|
+	OMITTED|POSTHOC|NOPOSTHOC|PREDICTION|REPEAT|NOREPEAT|REPEAT1|NOREPEAT1|
+	REPEAT2|NOREPEAT2|SIGMABOUNDTEST|NOSIGMABOUNDTEST|SLOW|NOSLOW|SORT|NOSORT|STIELTJES|THETABOUNDTEST|NOTHETABOUNDTEST
+;
+
+Boolean returns ecore::EBoolean: '0' | '1';
+
+RecordOption:
+	key=ID |
+	key=ID '=' value=OptionValue
+;
+
+OptionValue:
+	{OptionValue}
+	value+=OptionValueItem |
+	'(' value+=OptionValueList ')'
+;
+
+OptionValueItem: ID|INT;
+
+OptionValueList:
+	OptionValueItem ','?
+;
+
+PkRecord: {PkRecord} PK_RECORD code=AbbreviatedCode;
+ErrorRecord: {ErrorRecord} ERROR_RECORD code=AbbreviatedCode;
+
+AbbreviatedCode: statements+=AbbreviatedCodeStatement+;
+AbbreviatedCodeStatement:
+	Assignment //| If | IfThenElseBlock //| DoWhile | EndDo | Call |
+	//Write | Print | Return | Open | Close | Rewind | Exit
+;
+Assignment hidden(WS): A=AssignedValue '=' B=BaseExpression;
+AssignedValue: {AssignedValue} name=ID;
+
+//IfThenElseBlock:
+//	'IF' if=Condition 'THEN'
+//	then=AbbreviatedCode
+//	elseIf+=ElseIfBlock*
+//	else=ElseBlock?
+//	'ENDIF'
+//;
+//
+//ElseBlock:
+//	'ELSE' AbbreviatedCode
+//;
+//
+//ElseIfBlock:
+//'ELSEIF' if=Condition 'THEN'
+//then=AbbreviatedCode	
+//;
+//If:	'IF' if=Condition then=Assignment;
+
+Condition: '(' left=BoolExpression
+	(bool+=BooleanOperator right+=Condition)*
+	')'  
+;
+BoolExpression: left=BaseExpression comp=Comparator right=BaseExpression;
+
+// TODO: Is there ambiguity with 15 + -3 ? In R, you can do 15 +--++----+ 3
+
+// By putting {Addition.left} in the optional block, we only create an Addition if the block is activated
+// Otherwise, we simply return the value of Multiplication and do not create an additional element
+// {Addition.left=current} means: create an Addition, and assign the .left element to the just-created object
+BaseExpression returns Expression:	Multiplication ({Addition.left=current} opts+=('+'|'-') rights+=Multiplication)*;
+Multiplication returns Expression: Power ({Multiplication.left=current} opts+=('*'|'/') rights+=Power)*;
+Power returns Expression: Primary ({Power.left=current} '^' rights+=Primary)*;
+Primary returns Expression: '(' BaseExpression ')' | Atomic;
+Atomic returns Expression:
+	{SingleVectorCall} vector=SingleVector '(' i=INT ')' |
+	{DoubleVectorCall} vector=DoubleVector '(' i=INT ',' j=INT ')' | 
+	{FunctionCall} function=ID '(' argument=BaseExpression ')'
+	| {Variable} value=[AssignedValue | InputValue]
+	| {NumberLiteral} value=tNUMBER
+;
+
+SingleVector: 'THETA' | 'OMEGA' | 'SIGMA' | 'ETA'  | 'EPS'| 'ERR';
+DoubleVector: 'SIGMA' | 'OMEGA';
+BooleanOperator: '.AND.' | '.OR.';
+Comparator:	'.EQ.' | '.NE.' | '.LE.' | '.GE.' | '.LT.' | '.GT.' | '==' | '/=' | '<=' | '>=' | '<' | '>';
+
+ // TODO: complete this further
+PriorRecord: PRIOR_RECORD subroutine=Subroutine condition+=Condition* arguments+=PriorSubroutineArgument*;
+PriorSubroutineArgument hidden():
+	key=ID '=' value=tNUMBER ','? ;
+enum Subroutine: TNPRI='TNPRI' | NWPRI='NWPRI';
+
+SubroutinesRecord: SUBROUTINES_RECORD library+=ID+ ;
+
+ProblemRecord: {ProblemRecord} title=PROBLEM_RECORD; 
+
+DataRecord hidden(WS):
+	{DataRecord} DATA_RECORD name=DataFileName
+	(format=FormatStatement) ? 
+	('IGNORE=' ignore=ID)? 
+	('NULL=' null=ID)? 
+	(wide ?= 'WIDE')? 
+	(noWide?='NOWIDE')? 
+	(checkout?='CHECKOUT')?
+	('RECORDS=' records=INT)?
+	('LRECL=' lrecl=INT)?
+	(rewind ?= 'REWIND')? 
+	(noRewind?='NOREWIND')? 
+;
+
+FormatStatement:
+	'()' // TODO
+;
+
+DataFileName: FileName | STRING;
+InputRecord hidden(WS): {InputRecord} INPUT_RECORD columns+=InputColumn*;
+InputColumn: {InputColumn} (alternative=InputValue '=')? name=InputValue;
+InputValue: ID;
+
+ThetaRecord: {ThetaRecord} THETA_RECORD (values+=EstimateValueSet)*;
+/*
+ * [DIAGONAL(n)|BLOCK(n)|BLOCK(n) SAME(m)|BLOCK SAME(m)]
+         [BLOCK(n)VALUES(diag,odiag)]
+         [VARIANCE|STANDARD]  [COVARIANCE|CORRELATON] [CHOLESKY]
+ */
+
+OmegaRecord: OMEGA_RECORD
+	DiagonalOmega |
+	BlockOmega |
+	=>BlockSameOmega |
+	BlockValuesOmega
+;
+
+DiagonalOmega:
+	{DiagonalOmega}
+	('DIAGONAL(' diagonal=INT ')')?
+	(values+=EstimateValueSet)*
+;
+BlockOmega:
+	{BlockOmega}
+	( 'BLOCK' |
+		'BLOCK(' block=INT ')'
+	)
+	(values+=EstimateValueSet)*
+;
+BlockSameOmega:
+	{BlockSameOmega}
+	('BLOCK' |
+		'BLOCK(' block=INT ')'
+	)
+	('SAME' |
+		'SAME('same=INT')'
+	)
+	(values+=EstimateValueSet)*
+;
+BlockValuesOmega:
+	'BLOCK(' block=INT ')'
+	'VALUES(' diag=tNUMBER ',' odiag=tNUMBER ')'
+;
+
+SigmaRecord: {SigmaRecord} SIGMA_RECORD (values+=EstimateValueSet)*;
+
+EstimateValueSet:
+	'(' value=EstimateValue ')x' times=INT
+	| value=EstimateValue
+;
+
+FIX:
+	'FIX' ('ED')?
+;
+
+EstimateValue:
+	init=tNUMBER (fixed?=FIX)? |
+	'(' 
+	EstimateRange
+	(fixed?=FIX)? ')' 
+	(fixedOutsideBounds?=FIX)? 
+	// Silly rule: if FIXED is inside the parentheses, the bounds need to be equal to the estimate
+	// But if they are equal to the estimate, then it is FIXED anyway.
+	// if FIXED is outside the parentheses, the bounds can be different 
+	|
+	'(' low=tNUMBER ',' ',' high=tNUMBER ')' // no initial estimate
+	
+;
+
+EstimateRange:
+	init=tNUMBER |
+	low=tNUMBER ','? init=tNUMBER |
+	low=tNUMBER ','? init=tNUMBER ','? upper=tNUMBER // if an upper bound is used, a lower bound must also be used
+;
