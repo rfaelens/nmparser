@@ -71,6 +71,19 @@ JFlex is another option, but I really hate their language
 Some sections are very simple to parse. The only challenging aspects:
 
 * The amount of available options. We need to think whether we want the AST to contain a node per option, a specific feature per option, or .... For now, it was implemented by using `KeywordEstimationOption(key=KeywordEnum)` elements. If a value is accepted, we can parse using `IntegerEstimationOption` or `FilenameEstimationOption`, with enums as the keyword for each type. Verifying if the value is as expected should be done at compilation, not during parsing.
-* The fact that nonmem provides so many alternatives. The `$SIMULATION` section can be specified as `$SIM | $SIMU | $SIMUL | $SIMULA | $SIMULAT | $SIMULATI | $SIMULATIO | $SIMULATION | $SMT`.
+See also https://theantlrguy.atlassian.net/wiki/spaces/ANTLR3/pages/2687320/How+can+I+allow+keywords+as+identifiers
+* The fact that nonmem provides so many alternatives. The `$SIMULATION` section can be specified as `$SIM | $SIMU | $SIMUL | $SIMULA | $SIMULAT | $SIMULATI | $SIMULATIO | $SIMULATION | $SMT`. See also https://theantlrguy.atlassian.net/wiki/spaces/ANTLR3/pages/2687035/How+do+I+handle+abbreviated+keywords
 * To left-factorize recursive expressions.
 * To make the distinction between function calls and vector calls.
+
+## Repeating sections
+* NM-TRAN allows lines without a record name. It assumes the record has the same name as the previous record.
+* NM-TRAN allows records to be interleaved.
+
+From IV.pdf: "In general, all the information from all records which use (or are understood to use) the same name, or use (or are understood to use) an alias for this name, is regarded as coming from a single record with that name".
+
+Exceptions to this rule:
+* A new $PROBLEM record also finishes collation of all previous sections.
+* An $ESTIMATION record can contain multiple $ESTIMATION specifications (?)
+
+The easiest way to lex this, is probably to reorder the tokenstream. See https://stackoverflow.com/questions/50859020/reorder-token-stream-in-xtext-lexer
