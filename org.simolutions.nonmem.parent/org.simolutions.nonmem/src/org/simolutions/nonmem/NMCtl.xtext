@@ -1,44 +1,15 @@
 grammar org.simolutions.nonmem.NMCtl
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
+/*
+ * This grammar is only used for *parsing*. The lexer is a custom lexer.
+ * Therefore, all terminal tokens are defined as CUSTOM_LEXER
+ */
 generate nMCtl "http://www.simolutions.org/nonmem/NMCtl"
 
+
 Model hidden(NM_COMMENT, WS): records+=Record*;
-
-// The text must be contained on a single record, and only the first 72 characters of text (starting with the second character after the record name) are used in the heading. Spaces and semicolons in the text are included "as is".
-terminal PROBLEM_RECORD: '$PRO' -> ('\r'? '\n')? ;
-// See IV.pdf page 18: Text after a semicolon is regarded as a comment
-terminal NM_COMMENT: ';' !('\n'|'\r')* ('\r'? '\n')?;
-// See IV.pdf page 18: sections can be abbreviated to 3 letters
-terminal INPUT_RECORD: ('$INP' ('U'|'UT')?) | '$INPT';
-terminal DATA_RECORD: ('$DAT' ('A')?) | '$INFILE';
-terminal SUBROUTINES_RECORD: '$SUB' ('R'|'RO'|'ROU'|'ROUT'|'ROUTI'|'ROUTIN'|'ROUTINE'|'ROUTINES')?;
-terminal PRIOR_RECORD: '$PRI' ('O'|'OR')?;
-terminal PK_RECORD: '$PK';
-terminal ERROR_RECORD: '$ERR' ('O'|'OR')?;
-terminal THETA_RECORD: '$THETA';
-terminal OMEGA_RECORD: '$OMEGA';
-terminal SIGMA_RECORD: '$SIGMA';
-terminal ESTIMATION_RECORD: '$EST' ('M'|'I'|'IM'|'IMA'|'IMAT'|'IMATI'|'IMATIO'|'IMATION')?;
-terminal COVARIANCE_RECORD: '$COV' ('R'|'A'|'AR'|'ARI'|'ARIA'|'ARIAN'|'ARIANC'|'ARIANCE')?;
-terminal TABLE_RECORD: '$TABLE';
-
-terminal ID  		: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
-terminal STRING	: 
-			'"' ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|'"') )* '"' |
-			"'" ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|"'") )* "'"
-		;
-
-tNUMBER returns ecore::EFloat    : INT | NUMBER;
-terminal INT returns ecore::EInt: ('0'..'9')+;
-terminal NUMBER returns ecore::EFloat:
-(('+'|'-')? INT ('.'INT?) (('E'|'e')('+'|'-')? INT )?) |
-(('+'|'-')? INT           (('E'|'e')('+'|'-')? INT ) ) |
-(                ('.'INT) (('E'|'e')('+'|'-')? INT )?) |
-('-'        INT                                      );
-terminal WS			: (' '|'\t'|'\r'|'\n')+;
-
-FileName: (INT | ID | '.' | '_' | '-')+;
+tNUMBER returns ecore::EFloat    : INT | FLOAT;
 
 Record:
 	ProblemRecord | 
@@ -54,69 +25,20 @@ Record:
 	| CovarianceRecord
 	;
 
-CovarianceRecord: {CovarianceRecord} COVARIANCE_RECORD (options+=CovarianceOption)*;
-CovarianceOption: KeywordCovarianceOption | NumberCovarianceOption | OtherCovarianceOption;
-KeywordCovarianceOption: {KeywordCovarianceOption} value=KeywordCovarianceOptionKey;
-enum KeywordCovarianceOptionKey: SPECIAL|COMPRESS|NOSLOW|SLOW|NOFCOV|RESUME|CONDITIONAL|UNCONDITIONAL|OMITTED;
-NumberCovarianceOption: key=NumberCovarianceOptionKey '=' value=tNUMBER;
-enum NumberCovarianceOptionKey:	TOL|ATOL|SIGL|SIGLO;
-OtherCovarianceOption: key=OtherCovarianceOptionKey '=' value=FileName;
-enum OtherCovarianceOptionKey: MATRIX|PRINT|PARAFILE;
-
-TableRecord: {TableRecord} TABLE_RECORD (values+=ID)* (options+=TableOption)*;
-TableOption: KeywordTableOption | OtherTableOption;
-OtherTableOption:
-	{OtherTableOption} key=OtherTableOptionKey '=' value=FileName
-;
-enum OtherTableOptionKey: FILE|FORMAT|LFORMAT|RFORMAT|ESAMPLE|SEED|RANMETHOD;
-KeywordTableOption: {KeywordTableOption} key=KeywordTableOptionKey;
-enum KeywordTableOptionKey: 
-	PRINT|NOPRINT|NOHEADER|ONEHEADER|NOTITLE|NOLABEL|FIRSTONLY|NOFORWARD|FORWARD|
-         APPEND|NOAPPEND|WRESCHOL|UNCONDITIONAL|CONDITIONAL|OMITTED
-;
+CovarianceRecord: {CovarianceRecord} COVARIANCE_RECORD (options+=RecordOption)*;
+TableRecord: {TableRecord} TABLE_RECORD (values+=ID)* (options+=RecordOption)*;
 
 // Lots of options! Lots of ways to specify them in the grammar. We chose to implement this as discrete enums depending on the allowed type of the argument. 
 // This does allow for conflicting POSTHOC|NOPOSTHOC in the grammar, but this can be detected later.
-EstimationRecord: {EstimationRecord} ESTIMATION_RECORD (options+=EstimationOption)*;
-EstimationOption: KeywordEstimationOption | NumberEstimationOption | OtherEstimationOption;
-
-OtherEstimationOption: key=OtherEstimationOptionKey '=' value=FileName;
-// TODO: major simplification; we should describe the syntax for each option...
-enum OtherEstimationOptionKey: FILE|MSFO|PARAFILE|FORMAT|DELIM|GRD|GRID|METHOD|MUM|ORDER|RANMETHOD|ZERO;
-
-NumberEstimationOption: key=NumberEstimationOptionKey '=' value=tNUMBER;
-enum NumberEstimationOptionKey: 
-	ATOL|AUTO|CALPHA|CINTERVAL|CITER|CNSAMP|CONSTRAIN|CTYPE|DERCONT|DF|DFS|EONLY|ETADER|ETASTYPE|
-	FNLETA|IACCEPT|ISAMPEND|ISAMPLE|ISAMPLE_M1|ISAMPLE_M1A|ISAMPLE_M2|ISAMPLE_M3|ISCALE_MAX|
-	ISCALE_MIN|MAPINTER|MAPITER|MAXEVAL|MAXEVALS|MCETA|NBURN|NITER|NOCOV|NOLABEL|NONINFETA|NOPRIOR|
-	NOTITLE|NUMDER|OACCEPT|OPTMAP|OSAMPLE_M1|OSAMPLE_M2|PACCEPT|PRINT|PSAMPLE_M1|PSAMPLE_M2|
-	PSAMPLE_M3|PSCALE_MAX|PSCALE_MIN|SEED|SELECT|SIGDIGITS|NSIG|NSIGDIGITS|SIGL|SIGLO|SLOW|STDOBJ
-;
-KeywordEstimationOption: {KeywordEstimationOption} value=KeywordEstimationOptionKey;
-enum KeywordEstimationOptionKey: ABORT|NOABORT|NOHABORT|CENTERING|NOCENTERING|ETABARCHECK|NOETABARCHECK|FO|NOFO|
-	INTERACTION|NOINTERACTION|LAPLACIAN|NOLAPLACIAN|LIKELIHOOD|
-	TWOLOGLIKELIHOOD='-2LOGLIKELIHOOD'|NUMERICAL|NONUMERICAL|OMEGABOUNDTEST|NOOMEGABOUNDTEST|
-	OMITTED|POSTHOC|NOPOSTHOC|PREDICTION|REPEAT|NOREPEAT|REPEAT1|NOREPEAT1|
-	REPEAT2|NOREPEAT2|SIGMABOUNDTEST|NOSIGMABOUNDTEST|SLOW|NOSLOW|SORT|NOSORT|STIELTJES|THETABOUNDTEST|NOTHETABOUNDTEST
-;
-
-Boolean returns ecore::EBoolean: '0' | '1';
-
-RecordOption:
-	key=ID |
-	key=ID '=' value=OptionValue
-;
-
-OptionValue:
-	{OptionValue}
-	value+=OptionValueItem |
-	'(' value+=OptionValueList ')'
-;
-
-OptionValueItem: ID|INT;
-
-OptionValueList:
-	OptionValueItem ','?
+EstimationRecord: {EstimationRecord} ESTIMATION_RECORD (options+=RecordOption)*;
+RecordOption returns RecordOption:
+	{KeywordRecordOption} key=OPTION_KEY |
+	{IDRecordOption} key=OPTION_KEY_ID EQ id=ID |
+	{IntRecordOption} key=OPTION_KEY_INT EQ int=INT |
+	{Hack1RecordOption} key=OPTION_KEY_INT EQ value=ID | // TODO XXX: Oh great! PRINT is something with a number value in an $ESTIMATION record, but it can also be 'PRINT=E' in the $COV record!
+	{FilenameRecordOption} key=OPTION_KEY_FILENAME EQ file=FilenameOrString |
+	{FloatRecordOption} key=OPTION_KEY_FLOAT EQ float=tNUMBER |
+	{IntegerListRecordOption} key=OPTION_KEY_INTLIST EQ PARENL elements+=INT (COMMA elements+=INT)* PARENR
 ;
 
 PkRecord: {PkRecord} PK_RECORD code=AbbreviatedCode;
@@ -127,7 +49,7 @@ AbbreviatedCodeStatement:
 	Assignment //| If | IfThenElseBlock //| DoWhile | EndDo | Call |
 	//Write | Print | Return | Open | Close | Rewind | Exit
 ;
-Assignment hidden(WS): A=AssignedValue '=' B=BaseExpression;
+Assignment hidden(WS): A=AssignedValue EQ B=BaseExpression;
 AssignedValue: {AssignedValue} name=ID;
 
 //IfThenElseBlock:
@@ -148,135 +70,182 @@ AssignedValue: {AssignedValue} name=ID;
 //;
 //If:	'IF' if=Condition then=Assignment;
 
-Condition: '(' left=BoolExpression
+Condition: PARENL left=BoolExpression
 	(bool+=BooleanOperator right+=Condition)*
-	')'  
+	PARENR
 ;
 BoolExpression: left=BaseExpression comp=Comparator right=BaseExpression;
-
-// TODO: Is there ambiguity with 15 + -3 ? In R, you can do 15 +--++----+ 3
 
 // By putting {Addition.left} in the optional block, we only create an Addition if the block is activated
 // Otherwise, we simply return the value of Multiplication and do not create an additional element
 // {Addition.left=current} means: create an Addition, and assign the .left element to the just-created object
-BaseExpression returns Expression:	Multiplication ({Addition.left=current} opts+=('+'|'-') rights+=Multiplication)*;
-Multiplication returns Expression: Power ({Multiplication.left=current} opts+=('*'|'/') rights+=Power)*;
-Power returns Expression: Primary ({Power.left=current} '^' rights+=Primary)*;
-Primary returns Expression: '(' BaseExpression ')' | Atomic;
+BaseExpression returns Expression:	Multiplication ({Addition.left=current} opts+=(PLUS|MINUS) rights+=Multiplication)*;
+Multiplication returns Expression: Power ({Multiplication.left=current} opts+=(MULT|DIV) rights+=Power)*;
+Power returns Expression: Primary ({Power.left=current} POW rights+=Primary)*;
+Primary returns Expression: PARENL BaseExpression PARENR | Atomic;
 Atomic returns Expression:
-	{SingleVectorCall} vector=SingleVector '(' i=INT ')' |
-	{DoubleVectorCall} vector=DoubleVector '(' i=INT ',' j=INT ')' | 
-	{FunctionCall} function=ID '(' argument=BaseExpression ')'
-	| {Variable} value=[AssignedValue | InputValue]
+	{SingleVectorCall} vector=SingleVector PARENL i=INT PARENR |
+	{DoubleVectorCall} vector=DoubleVector PARENL i=INT COMMA j=INT PARENR | 
+	{FunctionCall} function=ID PARENL argument=BaseExpression PARENR
+	| {Variable} value=ID // or [AssignedValue]
 	| {NumberLiteral} value=tNUMBER
 ;
 
-SingleVector: 'THETA' | 'OMEGA' | 'SIGMA' | 'ETA'  | 'EPS'| 'ERR';
-DoubleVector: 'SIGMA' | 'OMEGA';
-BooleanOperator: '.AND.' | '.OR.';
-Comparator:	'.EQ.' | '.NE.' | '.LE.' | '.GE.' | '.LT.' | '.GT.' | '==' | '/=' | '<=' | '>=' | '<' | '>';
-
  // TODO: complete this further
-PriorRecord: PRIOR_RECORD subroutine=Subroutine condition+=Condition* arguments+=PriorSubroutineArgument*;
+PriorRecord: PRIOR_RECORD subroutine=ID condition+=Condition* arguments+=PriorSubroutineArgument*;
 PriorSubroutineArgument hidden():
-	key=ID '=' value=tNUMBER ','? ;
-enum Subroutine: TNPRI='TNPRI' | NWPRI='NWPRI';
+	key=ID EQ value=tNUMBER COMMA? ;
 
 SubroutinesRecord: SUBROUTINES_RECORD library+=ID+ ;
 
 ProblemRecord: {ProblemRecord} title=PROBLEM_RECORD; 
 
-DataRecord hidden(WS):
-	{DataRecord} DATA_RECORD name=DataFileName
-	(format=FormatStatement) ? 
-	('IGNORE=' ignore=ID)? 
-	('NULL=' null=ID)? 
-	(wide ?= 'WIDE')? 
-	(noWide?='NOWIDE')? 
-	(checkout?='CHECKOUT')?
-	('RECORDS=' records=INT)?
-	('LRECL=' lrecl=INT)?
-	(rewind ?= 'REWIND')? 
-	(noRewind?='NOREWIND')? 
+DataRecord hidden(WS, NM_COMMENT):
+	{DataRecord} DATA_RECORD file=FilenameOrString
+	(format=FormatStatement)? 
+	 options+=RecordOption*
 ;
 
-FormatStatement:
-	'()' // TODO
-;
+FilenameOrString: FILENAME| STRING;
 
-DataFileName: FileName | STRING;
+FormatStatement: PARENL ID PARENR; // TODO
+
 InputRecord hidden(WS): {InputRecord} INPUT_RECORD columns+=InputColumn*;
-InputColumn: {InputColumn} (alternative=InputValue '=')? name=InputValue;
-InputValue: ID;
+InputColumn: {InputColumn} (alternative=ID EQ)? name=ID;
+
 
 ThetaRecord: {ThetaRecord} THETA_RECORD (values+=EstimateValueSet)*;
-/*
- * [DIAGONAL(n)|BLOCK(n)|BLOCK(n) SAME(m)|BLOCK SAME(m)]
-         [BLOCK(n)VALUES(diag,odiag)]
-         [VARIANCE|STANDARD]  [COVARIANCE|CORRELATON] [CHOLESKY]
- */
-
-OmegaRecord: OMEGA_RECORD
-	DiagonalOmega |
-	BlockOmega |
-	=>BlockSameOmega |
-	BlockValuesOmega
+OmegaRecord hidden(): OMEGA_RECORD WS+
+	(DiagonalOmega |
+	BlockOmega 
+	| =>BlockSameOmega 
+	|BlockValuesOmega
+	)
 ;
 
-DiagonalOmega:
+DiagonalOmega hidden():
 	{DiagonalOmega}
-	('DIAGONAL(' diagonal=INT ')')?
+	(DIAGONAL PARENL  diagonal=INT  PARENR WS+)? // WS needs to be here, since it should only be here if we have a DIAGONAL block
 	(values+=EstimateValueSet)*
 ;
-BlockOmega:
+BlockOmega hidden():
 	{BlockOmega}
-	( 'BLOCK' |
-		'BLOCK(' block=INT ')'
+	( BLOCK |
+		BLOCK PARENL block=INT PARENR
 	)
+	WS+
 	(values+=EstimateValueSet)*
 ;
-BlockSameOmega:
+BlockSameOmega hidden():
 	{BlockSameOmega}
-	('BLOCK' |
-		'BLOCK(' block=INT ')'
+	(BLOCK |
+		BLOCK PARENL  block=INT  PARENR
 	)
-	('SAME' |
-		'SAME('same=INT')'
+	WS+
+	(SAME |
+		SAME PARENL  same=INT  PARENR
 	)
+	WS+
 	(values+=EstimateValueSet)*
 ;
-BlockValuesOmega:
-	'BLOCK(' block=INT ')'
-	'VALUES(' diag=tNUMBER ',' odiag=tNUMBER ')'
+BlockValuesOmega hidden():
+	BLOCK PARENL block=INT PARENR
+	WS+
+	VALUES PARENL diag=tNUMBER COMMA odiag=tNUMBER PARENR
 ;
 
 SigmaRecord: {SigmaRecord} SIGMA_RECORD (values+=EstimateValueSet)*;
 
-EstimateValueSet:
-	'(' value=EstimateValue ')x' times=INT
-	| value=EstimateValue
+EstimateValueSet hidden(NM_COMMENT):
+	value=EstimateValue (X times=INT)?
 ;
 
-FIX:
-	'FIX' ('ED')?
+EstimateValue hidden(WS, NM_COMMENT):
+	EstimateSingleValue | EstimateRange | EstimateRangeWithoutValue
 ;
 
-EstimateValue:
-	init=tNUMBER (fixed?=FIX)? |
-	'(' 
-	EstimateRange
-	(fixed?=FIX)? ')' 
-	(fixedOutsideBounds?=FIX)? 
+EstimateSingleValue: init=tNUMBER (fixed?=FIX)?;
+EstimateRange:
 	// Silly rule: if FIXED is inside the parentheses, the bounds need to be equal to the estimate
 	// But if they are equal to the estimate, then it is FIXED anyway.
 	// if FIXED is outside the parentheses, the bounds can be different 
-	|
-	'(' low=tNUMBER ',' ',' high=tNUMBER ')' // no initial estimate
-	
+	PARENL
+	EstimateRangeValue
+	(fixed?=FIX)? PARENR (fixedOutsideBounds?=FIX)? 
+;
+EstimateRangeWithoutValue: PARENL low=tNUMBER COMMA COMMA high=tNUMBER PARENR ; // no initial estimate;
+EstimateRangeValue:
+	init=tNUMBER |
+	low=tNUMBER COMMA? init=tNUMBER |
+	low=tNUMBER COMMA? init=tNUMBER COMMA? upper=tNUMBER // if an upper bound is used, a lower bound must also be used
 ;
 
-EstimateRange:
-	init=tNUMBER |
-	low=tNUMBER ','? init=tNUMBER |
-	low=tNUMBER ','? init=tNUMBER ','? upper=tNUMBER // if an upper bound is used, a lower bound must also be used
-;
+// THETA, OMEGA, SIGMA are treated differently in abbreviated code.
+// A function call is different from a vector index call!
+// And this means that the argument is either a number (INT), or an identifier (ID)
+// While a function call can have any basic expression inside of it!
+SingleVector: THETA | OMEGA | SIGMA | ETA | EPS | ERR;
+DoubleVector: OMEGA | SIGMA;
+BooleanOperator: AND_OP | OR_OP;
+Comparator:	EQ_OP | NE_OP | LE_OP | GE_OP | LT_OP | GT_OP;
+
+terminal PROBLEM_RECORD: "$PROBLEM";
+terminal NM_COMMENT: ';' !('\n'|'\r')* ('\r'? '\n')?;
+terminal INPUT_RECORD: "$INPUT";
+terminal DATA_RECORD: "$DATA";
+terminal SUBROUTINES_RECORD: "$SUBROUTINES";
+terminal PRIOR_RECORD: "$PRIOR";
+terminal PK_RECORD: "$PK";
+terminal ERROR_RECORD: "$ERROR";
+terminal THETA_RECORD: "$THETA";
+terminal OMEGA_RECORD: "$OMEGA";
+terminal SIGMA_RECORD: "$SIGMA";
+terminal ESTIMATION_RECORD: "$ESTIMATION";
+terminal COVARIANCE_RECORD: "$COVARIANCE";
+terminal TABLE_RECORD: "$TABLE";
+terminal WS	: (' '|'\t'|'\r'|'\n')+;
+terminal COMMA: ",";
+terminal PARENL: "(";
+terminal PARENR: ")";
+terminal FIX: "FIXED";
+terminal BLOCK: "BLOCK";
+terminal VALUES: "VALUES";
+terminal SAME: "SAME";
+terminal DIAGONAL: "DIAGONAL";
+terminal EQ: "=";
+terminal PLUS: "+";
+terminal MINUS: "-";
+terminal MULT: "*";
+terminal DIV: "/";
+terminal POW: "^";
+terminal X: "x"; // as used for $THETA (15)x3
+terminal THETA: "THETA";
+terminal OMEGA: "OMEGA";
+terminal SIGMA: "SIGMA";
+terminal ETA: "ETA";
+terminal EPS: "EPS";
+terminal ERR: "ERR";
+terminal AND_OP: ".AND.";
+terminal OR_OP: ".OR.";
+terminal EQ_OP: ".EQ." | "=="; // only in right context
+terminal NE_OP: ".NE." | "/="; // only in right context
+terminal LE_OP: ".LE." | "<="; // only in right context
+terminal GE_OP: ".GE." | ">="; // only in right context
+terminal LT_OP: ".LT." | ">"; // only in right context
+terminal GT_OP: ".GT." | "<"; // only in right context
+
+terminal OPTION_KEY: "CUSTOM1"; // context-sensitive
+terminal OPTION_KEY_ID: "CUSTOM2"; // an option where an ID will follow
+terminal OPTION_KEY_INT: "CUSTOM3"; // an option where an INT will follow
+terminal OPTION_KEY_FLOAT: "CUSTOM6"; // an option where a float will follow
+terminal OPTION_KEY_FILENAME: "CUSTOM5"; // an option where a filename will follow
+terminal OPTION_KEY_INTLIST: "CUSTOM4"; // an option where a list of integers will follow: ( value, value, value )
+terminal FILENAME: "CUSTOM_LEXER20";
+
+terminal FLOAT returns ecore::EFloatObject: "CUSTOM_LEXER18"; // depends on the context
+terminal ID : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
+terminal STRING : 
+			'"' ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|'"') )* '"' |
+			"'" ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|"'") )* "'"
+		;
+terminal INT returns ecore::EIntegerObject: ('0'..'9')+;

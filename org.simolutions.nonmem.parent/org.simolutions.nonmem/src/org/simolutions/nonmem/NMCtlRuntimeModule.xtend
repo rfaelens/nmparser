@@ -3,9 +3,15 @@
  */
 package org.simolutions.nonmem
 
+import org.simolutions.nonmem.parser.antlr.lexer.CustomNMCtlLexer
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
 class NMCtlRuntimeModule extends AbstractNMCtlRuntimeModule {
+	
+	override bindLexer() {
+		return CustomNMCtlLexer;
+	}
+	
 }
